@@ -10,7 +10,6 @@ async function main() {
             price: 15000
         }
     })
-    console.log(ayamGeprek)
 }
 
 main()
