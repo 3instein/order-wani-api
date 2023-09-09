@@ -2,13 +2,59 @@ import { PrismaClient } from "@prisma/client";
 import express, { Request, Response } from "express";
 import createError from "http-errors"
 import cors from "cors"
+import CryptoJS from "crypto-js";
+import { generateAccessToken, authenticateToken } from "./tokenHandling";
 
 const prisma = new PrismaClient()
 const app = express()
 
 app.use(express.json(), cors())
 
-app.get('/menus', async (req: Request, res: Response) => {
+app.post('/login', (req: Request, res: Response) => {
+  const { username, password } = req.body
+
+  if (!username || !password) {
+    return res.json({
+      status: 400,
+      message: 'Username and password are required'
+    })
+  }
+
+  const passwordHash = CryptoJS.SHA256(password).toString()
+
+  prisma.user.findFirst({
+    where: {
+      username
+    }
+  }).then(user => {
+    if (!user) {
+      return res.json({
+        status: 404,
+        message: 'User not found'
+      })
+    }
+
+    if (passwordHash !== user.password) {
+      return res.json({
+        status: 401,
+        message: `Wrong Password`
+      })
+    }
+
+    const token = generateAccessToken(username)
+
+    res.json({
+      status: 200,
+      message: 'Login success',
+      data: {
+        token
+      }
+    })
+  })
+})
+
+app.get('/menus', authenticateToken, async (req: Request, res: Response) => {
+
   const result = await prisma.menu.findMany()
 
   if (result.length === 0) {
