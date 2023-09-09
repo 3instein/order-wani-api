@@ -60,6 +60,31 @@ app.post('/login', (req: Request, res: Response) => {
   })
 })
 
+app.post('/verify_token', authenticateToken, (req: any, res: any) => {
+  prisma.user.findFirst({
+    where: {
+      username: req.user.username
+    }
+  }).then(user => {
+    if (!user) {
+      return res.json({
+        status: 404,
+        message: 'User not found'
+      });
+    }
+    res.json({
+      status: 200,
+      message: 'Token is valid',
+      data: user.username
+    });
+  }).catch(error => {
+    res.json({
+      status: 500,
+      message: 'Server error'
+    });
+  });
+})
+
 app.get('/menus', authenticateToken, async (req: Request, res: Response) => {
 
   const result = await prisma.menu.findMany()
