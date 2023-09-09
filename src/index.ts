@@ -4,11 +4,12 @@ import createError from "http-errors"
 import cors from "cors"
 import CryptoJS from "crypto-js";
 import { generateAccessToken, authenticateToken } from "./tokenHandling";
+import cookieParser from 'cookie-parser';
 
 const prisma = new PrismaClient()
 const app = express()
 
-app.use(express.json(), cors())
+app.use(express.json(), cors(), cookieParser())
 
 app.post('/login', (req: Request, res: Response) => {
   const { username, password } = req.body
@@ -27,18 +28,11 @@ app.post('/login', (req: Request, res: Response) => {
       username
     }
   }).then(user => {
-    if (!user) {
-      return res.json({
-        status: 404,
-        message: 'User not found'
-      })
-    }
-
-    if (passwordHash !== user.password) {
+    if (!user || passwordHash !== user.password) {
       return res.json({
         status: 401,
-        message: `Wrong Password`
-      })
+        message: 'Invalid credentials'
+      });
     }
 
     const token = generateAccessToken(username)
@@ -52,10 +46,7 @@ app.post('/login', (req: Request, res: Response) => {
     });
     res.json({
       status: 200,
-      message: 'Login success',
-      data: {
-        token
-      }
+      message: 'Login success'
     })
   })
 })
