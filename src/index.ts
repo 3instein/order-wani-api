@@ -43,6 +43,13 @@ app.post('/login', (req: Request, res: Response) => {
 
     const token = generateAccessToken(username)
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      // You might also want to set other cookie options like:
+      // secure: true,  // For HTTPS
+      // maxAge: ...    // Expiration duration
+      // sameSite: 'strict' // Protection against CSRF
+    });
     res.json({
       status: 200,
       message: 'Login success',
