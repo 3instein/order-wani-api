@@ -9,8 +9,7 @@ export function generateAccessToken(username: string) {
 }
 
 export function authenticateToken(req: any, res: any, next: any) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    const token = req.cookies.token
 
     if (!token) {
         return res.json({
