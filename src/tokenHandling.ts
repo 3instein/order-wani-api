@@ -9,12 +9,12 @@ export function generateAccessToken(username: string) {
 }
 
 export function authenticateToken(req: any, res: any, next: any) {
-    const token = req.cookies.token
+    const token = req.cookies.authToken
 
     if (!token) {
         return res.json({
             status: 401,
-            message: 'Unauthorized'
+            message: 'Unauthorized',
         })
     }
 

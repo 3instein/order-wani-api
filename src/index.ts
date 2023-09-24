@@ -12,44 +12,42 @@ const app = express()
 app.use(express.json(), cors(), cookieParser())
 
 app.post('/login', (req: Request, res: Response) => {
-  const { username, password } = req.body
+  const { username, password } = req.body;
 
   if (!username || !password) {
     return res.json({
       status: 400,
-      message: 'Username and password are required'
-    })
+      message: 'Username and password are required',
+    });
   }
 
-  const passwordHash = CryptoJS.SHA256(password).toString()
+  const passwordHash = CryptoJS.SHA256(password).toString();
 
   prisma.user.findFirst({
     where: {
-      username
-    }
-  }).then(user => {
+      username,
+    },
+  }).then((user) => {
     if (!user || passwordHash !== user.password) {
       return res.json({
         status: 401,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
       });
     }
 
-    const token = generateAccessToken(username)
+    const token = generateAccessToken(username);
 
-    res.cookie('token', token, {
+    // Set the token as an httpOnly cookie
+    res.cookie('authToken', token, {
       httpOnly: true,
-      // You might also want to set other cookie options like:
-      // secure: true,  // For HTTPS
-      // maxAge: ...    // Expiration duration
-      // sameSite: 'strict' // Protection against CSRF
     });
+
     res.json({
       status: 200,
-      message: 'Login success'
-    })
-  })
-})
+      message: 'Login success',
+    });
+  });
+});
 
 app.post('/verify_token', authenticateToken, (req: any, res: any) => {
   prisma.user.findFirst({
