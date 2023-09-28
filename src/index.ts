@@ -74,7 +74,7 @@ app.post('/verify_token', authenticateToken, (req: any, res: any) => {
   });
 })
 
-app.get('/menus', authenticateToken, async (req: Request, res: Response) => {
+app.get('/menus', async (req: Request, res: Response) => {
 
   const result = await prisma.menu.findMany()
 

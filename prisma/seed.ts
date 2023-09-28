@@ -16,7 +16,8 @@ async function main() {
         data: {
             image: "ayam-geprek.jpeg",
             name: "Ayam Geprek",
-            price: 15000
+            price: 15000,
+            type: "food"
         }
     })
 }

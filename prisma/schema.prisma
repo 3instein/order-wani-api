@@ -22,7 +22,13 @@ model Menu {
   image String
   name String
   price Int
+  type type @default(food)
   orders Order[]
+}
+
+enum type {
+  food
+  drink
 }
 
 model Order {
